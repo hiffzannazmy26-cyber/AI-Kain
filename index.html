@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0d1b2a" />
+  <title>AI Klasifikasi Corak Kain</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+  <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@3.20.0/dist/tf.min.js"></script>
+  <script defer src="app.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero card">
+      <div class="badge">AI Image Classification</div>
+      <h1>AI Klasifikasi Corak Kain Tradisional</h1>
+      <p>Ambil gambar atau muat naik imej kain untuk mengenal pasti kategori corak menggunakan model AI PictoBlox.</p>
+      <div id="modelStatus" class="status">Memuatkan model AI...</div>
+    </section>
+
+    <section class="card controls">
+      <div class="button-grid">
+        <button id="cameraBtn" type="button">📷 Ambil Gambar</button>
+        <label class="upload-btn" for="imageUpload">🖼️ Upload Gambar</label>
+        <input id="imageUpload" type="file" accept="image/*" />
+      </div>
+
+      <div id="cameraPanel" class="camera-panel hidden">
+        <video id="camera" autoplay playsinline></video>
+        <div class="button-grid small">
+          <button id="captureBtn" type="button">Tangkap Imej</button>
+          <button id="closeCameraBtn" type="button" class="secondary">Tutup Kamera</button>
+        </div>
+      </div>
+
+      <div class="preview-wrap">
+        <img id="preview" alt="Preview gambar" />
+        <div id="emptyPreview" class="empty-preview">Pilih gambar untuk mula klasifikasi</div>
+      </div>
+
+      <canvas id="captureCanvas" width="224" height="224" hidden></canvas>
+
+      <button id="predictBtn" type="button" class="primary" disabled>🤖 Kenal Pasti Corak</button>
+      <button id="resetBtn" type="button" class="secondary">Imbas Semula</button>
+    </section>
+
+    <section id="resultCard" class="card result hidden">
+      <div class="result-label">Jenis Corak</div>
+      <h2 id="topLabel">-</h2>
+      <div class="confidence-box">
+        <span>Keyakinan AI</span>
+        <strong id="topConfidence">0%</strong>
+      </div>
+      <p id="resultNote">Corak ini mempunyai kebarangkalian tertinggi berdasarkan model AI yang telah dilatih.</p>
+      <div id="allScores" class="scores"></div>
+    </section>
+
+    <footer>
+      <p>Model AI: PictoBlox • Web App: TensorFlow.js • Sesuai untuk GitHub Pages</p>
+    </footer>
+  </main>
+</body>
+</html>
