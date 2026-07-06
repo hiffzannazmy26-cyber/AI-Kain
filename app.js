@@ -5,7 +5,7 @@ const LABELS = [
   'Corak Bunga'
 ];
 
-const MODEL_URL = './model/savedModel.json';
+const MODEL_URL = './savedModel.json';
 const IMAGE_SIZE = 224;
 
 let model = null;
@@ -38,14 +38,14 @@ async function loadModel() {
   try {
     modelStatus.textContent = 'Memuatkan model AI...';
     model = await tf.loadLayersModel(MODEL_URL);
-    // Warm up model for faster first prediction.
     tf.tidy(() => model.predict(tf.zeros([1, IMAGE_SIZE, IMAGE_SIZE, 3])));
     modelStatus.textContent = 'Model AI sedia digunakan ✅';
+    modelStatus.classList.remove('error');
     modelStatus.classList.add('ready');
     updatePredictButton();
   } catch (error) {
     console.error(error);
-    modelStatus.textContent = 'Model gagal dimuatkan. Pastikan fail model berada dalam folder /model dan app dibuka melalui server/GitHub Pages.';
+    modelStatus.textContent = 'Model gagal dimuatkan. Pastikan savedModel.json dan weight.bin berada di halaman utama repository.';
     modelStatus.classList.add('error');
   }
 }
@@ -60,7 +60,7 @@ imageUpload.addEventListener('change', (event) => {
 function setPreview(src) {
   preview.onload = () => {
     currentImageReady = true;
-    URL.revokeObjectURL(src);
+    if (src.startsWith('blob:')) URL.revokeObjectURL(src);
     updatePredictButton();
   };
   preview.src = src;
@@ -84,12 +84,12 @@ async function predictImage() {
         .resizeBilinear([IMAGE_SIZE, IMAGE_SIZE])
         .toFloat();
 
-      // Kebanyakan model PictoBlox/Teachable Machine MobileNet menggunakan julat -1 hingga 1.
       return tensor.div(127.5).sub(1).expandDims(0);
     });
 
     const prediction = model.predict(input);
     const rawScores = await prediction.data();
+
     input.dispose();
     prediction.dispose();
 
@@ -101,7 +101,7 @@ async function predictImage() {
     showResult(scores);
   } catch (error) {
     console.error(error);
-    alert('Maaf, berlaku ralat semasa klasifikasi. Sila cuba gambar lain atau buka Console untuk lihat ralat.');
+    alert('Maaf, berlaku ralat semasa klasifikasi. Sila cuba gambar lain.');
   } finally {
     predictBtn.textContent = '🤖 Kenal Pasti Corak';
     updatePredictButton();
@@ -162,11 +162,13 @@ captureBtn.addEventListener('click', () => {
   captureCanvas.width = camera.videoWidth || IMAGE_SIZE;
   captureCanvas.height = camera.videoHeight || IMAGE_SIZE;
   context.drawImage(camera, 0, 0, captureCanvas.width, captureCanvas.height);
+
   const dataUrl = captureCanvas.toDataURL('image/jpeg', 0.92);
   preview.onload = () => {
     currentImageReady = true;
     updatePredictButton();
   };
+
   preview.src = dataUrl;
   preview.style.display = 'block';
   emptyPreview.classList.add('hidden');
